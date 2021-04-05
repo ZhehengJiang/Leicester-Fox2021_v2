@@ -16,10 +16,10 @@ from run_6ECG_classifier import run_6ECG_classifier,load_6ECG_model
 from run_3ECG_classifier import run_3ECG_classifier,load_3ECG_model
 from run_2ECG_classifier import run_2ECG_classifier,load_2ECG_model
 
-twelve_lead_model_filename = '12_lead_model.sav'
-six_lead_model_filename = '6_lead_model.sav'
-three_lead_model_filename = '3_lead_model.sav'
-two_lead_model_filename = '2_lead_model.sav'
+twelve_lead_model_filename = '12_lead_model.h5'
+six_lead_model_filename = '6_lead_model.h5'
+three_lead_model_filename = '3_lead_model.h5'
+two_lead_model_filename = '2_lead_model.h5'
 
 twelve_lead_model_filename_load = 'net_weights_12.h5'
 six_lead_model_filename_load = 'net_weights_6.h5'
@@ -144,11 +144,14 @@ def save_model(filename, classes, leads, imputer, classifier):
 
 # Load your trained 12-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
 def load_twelve_lead_model(model_directory):
+    model_directory = './'
     filename = os.path.join(model_directory, twelve_lead_model_filename_load)
     return load_12ECG_model(filename)
 
 # Load your trained 6-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
 def load_six_lead_model(model_directory):
+    model_directory = './'
+
     filename = os.path.join(model_directory, six_lead_model_filename_load)
     leads = six_leads
     feature_indices = [twelve_leads.index(lead) for lead in leads]
@@ -156,6 +159,8 @@ def load_six_lead_model(model_directory):
 
 # Load your trained 3-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
 def load_three_lead_model(model_directory):
+    model_directory = './'
+
     filename = os.path.join(model_directory, three_lead_model_filename_load)
     leads = three_leads
     feature_indices = [twelve_leads.index(lead) for lead in leads]
@@ -163,6 +168,8 @@ def load_three_lead_model(model_directory):
 
 # Load your trained 2-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
 def load_two_lead_model(model_directory):
+    model_directory = './'
+
     filename = os.path.join(model_directory, two_lead_model_filename_load)
     leads = two_leads
     feature_indices = [twelve_leads.index(lead) for lead in leads]

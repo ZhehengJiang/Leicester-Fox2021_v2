@@ -110,6 +110,9 @@ def train_3ECG_classifier(input_directory, filename):
         "diag_matrix": diag_matrix
     })
 
+    params['mean'] = np.array(params['mean'])[feature_indices].tolist()
+    params['std'] = np.array(params['std'])[feature_indices].tolist()
+
     model = network.build_network(**params)
     # model.summary()
     stopping = keras.callbacks.EarlyStopping(patience=10)
@@ -136,7 +139,8 @@ def train_3ECG_classifier(input_directory, filename):
     final_model={'model':model, 'classes':preproc.classes}
 
     # filename = os.path.join(output_directory, 'finalized_model.sav')
-    joblib.dump(final_model, filename, protocol=0)
+    # joblib.dump(final_model, filename, protocol=0)
+    model.save_weights(filename)
 
 # Load challenge data.
 def load_challenge_data(header_file,feature_indices):

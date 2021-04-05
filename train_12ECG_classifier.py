@@ -130,7 +130,8 @@ def train_12ECG_classifier(input_directory, filename):
     final_model={'model':model, 'classes':preproc.classes}
 
     # filename = os.path.join(output_directory, 'finalized_model.sav')
-    joblib.dump(final_model, filename, protocol=0)
+    # joblib.dump(final_model, filename, protocol=0)
+    model.save_weights(filename)
 
 # Load challenge data.
 def load_challenge_data(header_file):
