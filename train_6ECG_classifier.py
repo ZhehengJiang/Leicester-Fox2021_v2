@@ -14,7 +14,11 @@ MAX_EPOCHS = 1
 MAX_LEN = 16384
 STEP = 256
 # os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-def train_12ECG_classifier(input_directory, filename):
+twelve_leads = ('I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6')
+six_leads = ('I', 'II', 'III', 'aVR', 'aVL', 'aVF')
+three_leads = ('I', 'II', 'V2')
+two_leads = ('II', 'V5')
+def train_6ECG_classifier(input_directory, filename):
 
     df = pd.read_csv('dx_mapping_scored.csv', sep=',')
     codes = df.values[:,1].astype(np.str)
@@ -42,9 +46,11 @@ def train_12ECG_classifier(input_directory, filename):
     recordings = list()
     headers = list()
     labels = list()
+    leads = six_leads
+    feature_indices = [twelve_leads.index(lead) for lead in leads]
 
     for i in range(num_files):
-        recording, header = load_challenge_data(header_files[i])
+        recording, header = load_challenge_data(header_files[i],feature_indices)
         recordings.append(recording.T)
         headers.append(header)
         for l in header:
@@ -98,7 +104,7 @@ def train_12ECG_classifier(input_directory, filename):
                             CPT[i, j] = CPT[i, j] + 1
         CPT[i, :] = CPT[i, :] / num_all
     params.update({
-        "input_shape": [MAX_LEN, 12],
+        "input_shape": [MAX_LEN, len(leads)],
         "num_categories": len(preproc.classes),
         "CPT": CPT,
         "diag_matrix": diag_matrix
@@ -133,13 +139,13 @@ def train_12ECG_classifier(input_directory, filename):
     joblib.dump(final_model, filename, protocol=0)
 
 # Load challenge data.
-def load_challenge_data(header_file):
+def load_challenge_data(header_file,feature_indices):
     with open(header_file, 'r') as f:
         header = f.readlines()
     mat_file = header_file.replace('.hea', '.mat')
     x = loadmat(mat_file)
     recording = np.asarray(x['val'], dtype=np.float64)
-    return recording, header
+    return recording[feature_indices,:], header
 
 # Find unique classes.
 def get_classes(input_directory, filenames):

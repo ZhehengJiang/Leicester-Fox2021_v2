@@ -11,7 +11,7 @@ import pandas as pd
 # MAX_LEN = 71936
 MAX_LEN = 16384
 # os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-def run_12ECG_classifier(data,header_data,model):
+def run_6ECG_classifier(data,header_data,model):
 
     # net_classes = ['AF', 'AF,LBBB', 'AF,LBBB,STD', 'AF,PAC', 'AF,PVC', 'AF,RBBB', 'AF,STD', 'AF,STE', 'I-AVB', 'I-AVB,LBBB',
     #  'I-AVB,PAC', 'I-AVB,PVC', 'I-AVB,RBBB', 'I-AVB,STD', 'I-AVB,STE', 'LBBB', 'LBBB,PAC', 'LBBB,PVC', 'LBBB,STE',
@@ -62,7 +62,7 @@ def run_12ECG_classifier(data,header_data,model):
 
     return current_label, current_score, classes
 
-def load_12ECG_model(weight_filename):
+def load_6ECG_model(weight_filename,feature_indices):
     # load the model from disk
     config_file = 'config.json'
     params = json.load(open(config_file, 'r'))
@@ -79,10 +79,13 @@ def load_12ECG_model(weight_filename):
     diag_matrix = np.identity(len(codes))
     CPT = params['CPT']
     params.update({
-        "input_shape": [MAX_LEN, 12],
+        "input_shape": [MAX_LEN, 6],
         "CPT": np.array(CPT),
         "diag_matrix": diag_matrix
     })
+
+    params['mean'] = np.array(params['mean'])[feature_indices].tolist()
+    params['std'] = np.array(params['std'])[feature_indices].tolist()
     loaded_model = network.build_network(**params)
     loaded_model.load_weights(weight_filename)
 

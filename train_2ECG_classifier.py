@@ -18,7 +18,7 @@ twelve_leads = ('I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', '
 six_leads = ('I', 'II', 'III', 'aVR', 'aVL', 'aVF')
 three_leads = ('I', 'II', 'V2')
 two_leads = ('II', 'V5')
-def train_6ECG_classifier(input_directory, filename):
+def train_2ECG_classifier(input_directory, filename):
 
     df = pd.read_csv('dx_mapping_scored.csv', sep=',')
     codes = df.values[:,1].astype(np.str)
@@ -46,7 +46,7 @@ def train_6ECG_classifier(input_directory, filename):
     recordings = list()
     headers = list()
     labels = list()
-    leads = six_leads
+    leads = two_leads
     feature_indices = [twelve_leads.index(lead) for lead in leads]
 
     for i in range(num_files):

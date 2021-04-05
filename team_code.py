@@ -8,12 +8,23 @@ import numpy as np, os, sys, joblib
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import RandomForestClassifier
 from train_12ECG_classifier import train_12ECG_classifier
-from run_12ECG_classifier import run_12ECG_classifier
+from train_6ECG_classifier import train_6ECG_classifier
+from train_3ECG_classifier import train_3ECG_classifier
+from train_2ECG_classifier import train_2ECG_classifier
+from run_12ECG_classifier import run_12ECG_classifier,load_12ECG_model
+from run_6ECG_classifier import run_6ECG_classifier,load_6ECG_model
+from run_3ECG_classifier import run_3ECG_classifier,load_3ECG_model
+from run_2ECG_classifier import run_2ECG_classifier,load_2ECG_model
 
 twelve_lead_model_filename = '12_lead_model.sav'
 six_lead_model_filename = '6_lead_model.sav'
 three_lead_model_filename = '3_lead_model.sav'
 two_lead_model_filename = '2_lead_model.sav'
+
+twelve_lead_model_filename_load = 'net_weights_12.h5'
+six_lead_model_filename_load = 'net_weights_6.h5'
+three_lead_model_filename_load = 'net_weights_3.h5'
+two_lead_model_filename_load = 'net_weights_2.h5'
 
 ################################################################################
 #
@@ -92,7 +103,7 @@ def training_code(data_directory, model_directory):
     #
     # imputer = SimpleImputer().fit(features)
     # features = imputer.transform(features)
-    train_12ECG_classifier(data_directory, model_directory)
+    train_12ECG_classifier(data_directory, filename)
     # classifier = RandomForestClassifier(n_estimators=n_estimators, max_leaf_nodes=max_leaf_nodes, random_state=random_state).fit(features, labels)
     # save_model(filename, classes, leads, imputer, classifier)
 
@@ -102,41 +113,22 @@ def training_code(data_directory, model_directory):
     leads = six_leads
     filename = os.path.join(model_directory, six_lead_model_filename)
 
-    feature_indices = [twelve_leads.index(lead) for lead in leads] + [12, 13]
-    features = data[:, feature_indices]
-
-    imputer = SimpleImputer().fit(features)
-    features = imputer.transform(features)
-    classifier = RandomForestClassifier(n_estimators=n_estimators, max_leaf_nodes=max_leaf_nodes, random_state=random_state).fit(features, labels)
-    save_model(filename, classes, leads, imputer, classifier)
+    train_6ECG_classifier(data_directory, filename)
 
     # Train 3-lead ECG model.
     print('Training 3-lead ECG model...')
 
     leads = three_leads
     filename = os.path.join(model_directory, three_lead_model_filename)
+    train_3ECG_classifier(data_directory, filename)
 
-    feature_indices = [twelve_leads.index(lead) for lead in leads] + [12, 13]
-    features = data[:, feature_indices]
-
-    imputer = SimpleImputer().fit(features)
-    features = imputer.transform(features)
-    classifier = RandomForestClassifier(n_estimators=n_estimators, max_leaf_nodes=max_leaf_nodes, random_state=random_state).fit(features, labels)
-    save_model(filename, classes, leads, imputer, classifier)
 
     # Train 2-lead ECG model.
     print('Training 2-lead ECG model...')
 
     leads = two_leads
     filename = os.path.join(model_directory, two_lead_model_filename)
-
-    feature_indices = [twelve_leads.index(lead) for lead in leads] + [12, 13]
-    features = data[:, feature_indices]
-
-    imputer = SimpleImputer().fit(features)
-    features = imputer.transform(features)
-    classifier = RandomForestClassifier(n_estimators=n_estimators, max_leaf_nodes=max_leaf_nodes, random_state=random_state).fit(features, labels)
-    save_model(filename, classes, leads, imputer, classifier)
+    train_2ECG_classifier(data_directory, filename)
 
 ################################################################################
 #
@@ -152,23 +144,29 @@ def save_model(filename, classes, leads, imputer, classifier):
 
 # Load your trained 12-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
 def load_twelve_lead_model(model_directory):
-    filename = os.path.join(model_directory, twelve_lead_model_filename)
-    return load_model(filename)
+    filename = os.path.join(model_directory, twelve_lead_model_filename_load)
+    return load_12ECG_model(filename)
 
 # Load your trained 6-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
 def load_six_lead_model(model_directory):
-    filename = os.path.join(model_directory, six_lead_model_filename)
-    return load_model(filename)
+    filename = os.path.join(model_directory, six_lead_model_filename_load)
+    leads = six_leads
+    feature_indices = [twelve_leads.index(lead) for lead in leads]
+    return load_6ECG_model(filename,feature_indices)
 
 # Load your trained 3-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
 def load_three_lead_model(model_directory):
-    filename = os.path.join(model_directory, three_lead_model_filename)
-    return load_model(filename)
+    filename = os.path.join(model_directory, three_lead_model_filename_load)
+    leads = three_leads
+    feature_indices = [twelve_leads.index(lead) for lead in leads]
+    return load_3ECG_model(filename,feature_indices)
 
 # Load your trained 2-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
 def load_two_lead_model(model_directory):
-    filename = os.path.join(model_directory, two_lead_model_filename)
-    return load_model(filename)
+    filename = os.path.join(model_directory, two_lead_model_filename_load)
+    leads = two_leads
+    feature_indices = [twelve_leads.index(lead) for lead in leads]
+    return load_2ECG_model(filename,feature_indices)
 
 # Generic function for loading a model.
 def load_model(filename):
@@ -182,7 +180,7 @@ def load_model(filename):
 
 # Run your trained 12-lead ECG model. This function is *required*. Do *not* change the arguments of this function.
 def run_twelve_lead_model(model, header, recording):
-    [current_label, current_score, classes] = run_12ECG_classifier(model, header, recording)
+    [current_label, current_score, classes] = run_12ECG_classifier(recording,header,  model)
     return classes,current_label, current_score
 
 # Run your trained 6-lead ECG model. This function is *required*. Do *not* change the arguments of this function.

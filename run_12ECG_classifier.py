@@ -62,9 +62,8 @@ def run_12ECG_classifier(data,header_data,model):
 
     return current_label, current_score, classes
 
-def load_12ECG_model(input_directory):
-    # load the model from disk 
-    weight_filename = 'net_weights.h5'
+def load_12ECG_model(weight_filename):
+    # load the model from disk
     config_file = 'config.json'
     params = json.load(open(config_file, 'r'))
     df = pd.read_csv('dx_mapping_scored.csv', sep=',')
