@@ -1,14 +1,14 @@
-FROM python:3.8.6-slim
 
-## The MAINTAINER instruction sets the author field of the generated images.
-MAINTAINER author@example.com
+FROM tensorflow/tensorflow:1.14.0-gpu-py3
 
-## DO NOT EDIT the 3 lines.
+## The MAINTAINER instruction sets the Author field of the generated images
+MAINTAINER author@sample.com
+## DO NOT EDIT THESE 3 lines
 RUN mkdir /physionet
 COPY ./ /physionet
 WORKDIR /physionet
 
-## Install your dependencies here using apt install, etc.
+## Install your dependencies here using apt-get etc.
 
-## Include the following line if you have a requirements.txt file.
-RUN pip install -r requirements.txt
+## Do not edit if you have a requirements.txt
+RUN pip install --default-timeout=100 -r requirements.txt
